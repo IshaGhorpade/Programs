@@ -1,0 +1,156 @@
+#include <iostream>
+#include <string>
+#include <list>
+#include <cstring>
+
+using namespace std;
+
+const int TABLE_SIZE = 10;  // Size of the hash table
+
+// Hash function to calculate the index for a given name
+int hashFunction(const string& name) {
+    int hash = 0;
+    for (char ch : name) {
+        hash = (hash + ch) % TABLE_SIZE;  // Sum ASCII values and mod with table size
+    }
+    return hash;
+}
+
+// ====================== Chaining Hash Table ======================
+class ChainingHashTable {
+    list<pair<string, string>> table[TABLE_SIZE];  // Array of lists (linked chains)
+
+public:
+    // Insert a name-phone pair into the hash table
+    void insert(const string& name, const string& phone) {
+        int index = hashFunction(name);  // Calculate the index
+        table[index].push_back({name, phone});  // Add to the chain at that index
+    }
+
+    // Search for a name and return the number of comparisons made
+    int search(const string& name) {
+        int index = hashFunction(name);  // Calculate the index
+        int comparisons = 0;
+
+        // Traverse the linked list at this index
+        for (const auto& entry : table[index]) {
+            comparisons++;
+            if (entry.first == name) {
+                cout << "Found " << name << " -> " << entry.second << endl;
+                return comparisons;
+            }
+        }
+
+        cout << name << " not found.\n";
+        return comparisons;
+    }
+};
+
+// ====================== Linear Probing Hash Table ======================
+class LinearProbingHashTable {
+    string names[TABLE_SIZE];   // Array to store names
+    string phones[TABLE_SIZE];  // Array to store phone numbers
+
+public:
+    // Constructor to initialize the arrays
+    LinearProbingHashTable() {
+        memset(names, 0, sizeof(names));  // Initialize names array to empty strings
+    }
+
+    // Insert a name-phone pair into the hash table
+    void insert(const string& name, const string& phone) {
+        int index = hashFunction(name);  // Calculate the index
+        int originalIndex = index;
+
+        // Find the next empty slot using linear probing
+        while (!names[index].empty()) {
+            index = (index + 1) % TABLE_SIZE;
+            if (index == originalIndex) {  // Table is full
+                cout << "Hash table is full.\n";
+                return;
+            }
+        }
+
+        // Insert the name and phone number
+        names[index] = name;
+        phones[index] = phone;
+    }
+
+    // Search for a name and return the number of comparisons made
+    int search(const string& name) {
+        int index = hashFunction(name);  // Calculate the index
+        int originalIndex = index;
+        int comparisons = 0;
+
+        // Search using linear probing
+        while (!names[index].empty()) {
+            comparisons++;
+            if (names[index] == name) {
+                cout << "Found " << name << " -> " << phones[index] << endl;
+                return comparisons;
+            }
+            index = (index + 1) % TABLE_SIZE;
+            if (index == originalIndex) break;  // Return to the starting point
+        }
+
+        cout << name << " not found.\n";
+        return comparisons;
+    }
+};
+
+// ====================== Main Function ======================
+int main() {
+    ChainingHashTable chainingTable;
+    LinearProbingHashTable linearTable;
+
+    int n;
+    cout << "Enter the number of entries to insert: ";
+    cin >> n;
+
+    // Insert data into both hash tables
+    for (int i = 0; i < n; ++i) {
+        string name, phone;
+        cout << "Enter name: ";
+        cin >> name;
+        cout << "Enter phone number: ";
+        cin >> phone;
+
+        chainingTable.insert(name, phone);
+        linearTable.insert(name, phone);
+    }
+
+    // Search operations for chaining hash table
+    cout << "\n--- Chaining Hash Table ---\n";
+    string searchName;
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    int comparisons1 = chainingTable.search(searchName);
+
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    int comparisons2 = chainingTable.search(searchName);
+
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    int comparisons3 = chainingTable.search(searchName);
+
+    cout << "Total Chaining Comparisons: " << comparisons1 + comparisons2 + comparisons3 << endl;
+
+    // Search operations for linear probing hash table
+    cout << "\n--- Linear Probing Hash Table ---\n";
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    comparisons1 = linearTable.search(searchName);
+
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    comparisons2 = linearTable.search(searchName);
+
+    cout << "Enter name to search: ";
+    cin >> searchName;
+    comparisons3 = linearTable.search(searchName);
+
+    cout << "Total Linear Probing Comparisons: " << comparisons1 + comparisons2 + comparisons3 << endl;
+
+    return 0;
+}

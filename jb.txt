@@ -1,0 +1,58 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct Job {
+char id;
+int deadline;
+int profit;
+};
+
+bool compare(Job a, Job b) {
+return a.profit > b.profit;
+}
+
+int main() {
+int n;
+cout << "Enter the number of jobs: ";
+cin >> n;
+
+vector<Job> jobs(n);
+cout << "Enter Job ID, Deadline, and Profit for each job:\n";
+for (int i = 0; i < n; ++i) {
+cout << "Job " << i + 1 << ": ";
+cin >> jobs[i].id >> jobs[i].deadline >> jobs[i].profit;
+}
+
+sort(jobs.begin(), jobs.end(), compare);
+
+int maxDeadline = 0;
+for (int i = 0; i < n; ++i) {
+maxDeadline = max(maxDeadline, jobs[i].deadline);
+}
+
+vector<int> slot(maxDeadline + 1, -1);
+vector<char> selectedJobs;
+int totalProfit = 0;
+
+for (int i = 0; i < n; ++i) {
+for (int j = jobs[i].deadline; j > 0; --j) {
+if (slot[j] == -1) {
+slot[j] = i;
+selectedJobs.push_back(jobs[i].id);
+totalProfit += jobs[i].profit;
+break;
+}
+}
+}
+
+cout << "\nSelected Jobs: ";
+for (char job : selectedJobs) {
+cout << job << " ";
+}
+cout << "\nTotal Profit: " << totalProfit << endl;
+
+return 0;
+}

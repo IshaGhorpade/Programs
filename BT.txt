@@ -1,0 +1,102 @@
+#include<iostream>
+using namespace std;
+
+class Node{
+    public:
+        int data;
+        Node* left;
+        Node* right;
+
+        Node(int d){
+            this->data=d;
+            this->left=NULL;
+            this->right=NULL;
+        }
+};
+
+Node* create(Node* root){
+    int data;
+    cout<<"enter data:";
+    cin>>data;
+
+    root=new Node(data);
+
+    if(data==-1){
+        return NULL;
+    }
+
+    cout<<"enter data for inserting in left of "<<data<<endl;
+    root->left=create(root->left);
+
+    cout<<"enter data for inserting in right of "<<data<<endl;
+    root->right=create(root->right);
+
+    return root;
+}
+
+void display_inorder(Node* root){
+    if(root==NULL){
+        return;
+    }
+
+    display_inorder(root->left);
+    cout<<root->data<<" ";
+    display_inorder(root->right);
+    cout<<endl;
+}
+
+int depth_of_tree(Node*root){
+    if(root==NULL){
+        return 0;
+    }
+
+    int leftsubtree_depth=depth_of_tree(root->left);
+    int rightsubtree=depth_of_tree(root->right);
+    
+    return max(leftsubtree_depth,rightsubtree) +1;
+}
+
+void display_leafnodes(Node* root){
+    if(root==NULL){
+        return;
+    }
+    if(root->left==NULL && root->right==NULL){
+        cout<<root->data<<endl;
+    }
+    display_leafnodes(root->left);
+    display_leafnodes(root->right);
+}
+
+Node* copy_of_tree(Node* root){
+    if(root==NULL){
+        return NULL;
+    }
+
+    Node* new_node= new Node(root->data);
+    new_node->left=copy_of_tree(root->left);
+    new_node->right=copy_of_tree(root->right);
+
+    return new_node;
+}
+
+int main(){
+    Node* root=NULL;
+
+    root=create(root);
+
+   cout<<"inorder traversal: "<<endl;
+   display_inorder(root);
+
+    int depth=depth_of_tree(root);
+    cout<<"depth of tree: "<<depth<<endl;
+
+    cout<<"leaf nodes:"<<endl;
+    display_leafnodes(root);
+
+    Node* copy=copy_of_tree(root);
+    cout<<"inorder traversal of copy of tree:";
+    display_inorder(copy);
+    cout<<endl;
+    
+    return 0;
+}
